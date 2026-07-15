@@ -23,7 +23,10 @@ Open the Vite URL shown in the terminal.
 - Discovery-method filtering updates the world list.
 - Selecting a world updates the visual, evidence board, astrobiology read, and temperature marker.
 - The evidence board always separates known values, estimates, and unknown values.
+- Every evidence item includes a field source link.
 - Comparison chips can add and remove worlds without layout breakage.
+- Educator mode can show and hide field-guide prompts.
+- Field-guide tabs switch content without changing the selected world.
 - NASA source links open in a new tab.
 - The page remains readable at mobile width.
 
@@ -47,8 +50,20 @@ Expected behavior:
 
 - TypeScript compilation succeeds.
 - Vite emits a `dist/` directory.
+- `dist/_headers` exists when static-host security headers are needed.
 
-## 6. Preview Production Build
+## 6. Snapshot Refresh
+
+```bash
+npm run data:refresh
+```
+
+Expected behavior:
+
+- `src/data/nasa-snapshot.json` is updated with a bounded list of NASA archive rows.
+- `npm run build` still succeeds afterward.
+
+## 7. Preview Production Build
 
 ```bash
 npm run preview

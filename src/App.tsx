@@ -1,21 +1,28 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   Activity,
   BookOpen,
   Database,
   ExternalLink,
   FlaskConical,
+  GraduationCap,
   Github,
   Globe2,
+  Layers3,
   Orbit,
   RefreshCw,
   Search,
+  ShieldCheck,
   SlidersHorizontal,
   Sparkles,
+  Telescope,
 } from "lucide-react";
-import { fetchNasaWorlds } from "./data/nasa";
+import { fetchNasaWorlds, parseNasaWorlds } from "./data/nasa";
+import nasaSnapshotRows from "./data/nasa-snapshot.json";
 import { curatedWorlds } from "./data/worlds";
 import type { EvidenceItem, EvidenceLevel, World } from "./types";
+
+const archiveSnapshot = parseNasaWorlds(nasaSnapshotRows);
 
 const kelvinToCelsius = (kelvin?: number) =>
   typeof kelvin === "number" ? `${Math.round(kelvin - 273.15)} C` : "Unknown";
@@ -31,42 +38,49 @@ function levelFor(value: unknown, estimated = false): EvidenceLevel {
 }
 
 function buildEvidence(world: World): EvidenceItem[] {
+  const sourceUrl = world.nasaUrl;
   return [
     {
       label: "Planet size",
       value: world.planetRadiusEarth ? `${formatNumber(world.planetRadiusEarth, 2)} Earth radii` : "Unknown",
       level: levelFor(world.planetRadiusEarth),
       note: "Radius helps separate likely rocky worlds from larger mini-Neptunes, but it cannot prove habitability alone.",
+      sourceUrl,
     },
     {
       label: "Planet mass",
       value: world.planetMassEarth ? `${formatNumber(world.planetMassEarth, 2)} Earth masses` : "Unknown",
       level: levelFor(world.planetMassEarth),
       note: "Mass constrains density and surface gravity when radius is also known.",
+      sourceUrl,
     },
     {
       label: "Equilibrium temperature",
       value: world.equilibriumTempK ? `${formatNumber(world.equilibriumTempK, 0)} K / ${kelvinToCelsius(world.equilibriumTempK)}` : "Unknown",
       level: levelFor(world.equilibriumTempK, true),
       note: "This is a simplified estimate before atmosphere, clouds, greenhouse effects, and surface conditions are known.",
+      sourceUrl,
     },
     {
       label: "Orbit length",
       value: world.orbitalPeriodDays ? `${formatNumber(world.orbitalPeriodDays, 2)} Earth days` : "Unknown",
       level: levelFor(world.orbitalPeriodDays),
       note: "Orbital period reveals how close the world is to its star and whether follow-up transits are practical.",
+      sourceUrl,
     },
     {
       label: "Host star",
       value: world.stellarTempK ? `${world.host}, ${formatNumber(world.stellarTempK, 0)} K` : world.host,
       level: levelFor(world.host),
       note: "Star size, temperature, and activity shape radiation, climate, and atmospheric escape.",
+      sourceUrl,
     },
     {
       label: "Distance",
       value: world.distanceLy !== undefined ? `${formatNumber(world.distanceLy, 1)} light-years` : "Unknown",
       level: levelFor(world.distanceLy),
       note: "Nearby systems are easier to study with telescopes, but distance does not determine whether life exists.",
+      sourceUrl,
     },
   ];
 }
@@ -94,15 +108,55 @@ function tempPosition(temp?: number) {
   return Math.max(4, Math.min(96, ((temp - 120) / 260) * 100));
 }
 
+function mergeWorlds(...groups: World[][]) {
+  const seen = new Set<string>();
+  return groups.flat().filter((world) => {
+    const key = world.name.toLowerCase();
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+
+const fieldGuides = [
+  {
+    id: "biosignatures",
+    title: "Biosignatures",
+    prompt: "What observation would make this world more interesting, and what false positive could mimic it?",
+    body: "A biosignature is strongest when chemistry, context, and repeated observations point in the same direction.",
+  },
+  {
+    id: "ocean-worlds",
+    title: "Ocean worlds",
+    prompt: "Could life have energy without sunlight here?",
+    body: "Moons like Europa show why astrobiology cares about subsurface oceans, chemistry, and internal heat.",
+  },
+  {
+    id: "stellar-risk",
+    title: "Host star risk",
+    prompt: "How might radiation or flares affect atmosphere retention?",
+    body: "Small cool stars make transits easier to study, but stellar activity can complicate surface habitability.",
+  },
+];
+
 function App() {
   const [query, setQuery] = useState("");
-  const [source, setSource] = useState<"curated" | "nasa">("curated");
-  const [worlds, setWorlds] = useState<World[]>(curatedWorlds);
+  const [source, setSource] = useState<"curated" | "snapshot" | "nasa">("snapshot");
+  const [worlds, setWorlds] = useState<World[]>(() => mergeWorlds(curatedWorlds, archiveSnapshot));
   const [selectedId, setSelectedId] = useState(curatedWorlds[4].id);
   const [comparisonIds, setComparisonIds] = useState<string[]>(["earth", "trappist-1e", "proxima-centauri-b"]);
   const [method, setMethod] = useState("All");
-  const [status, setStatus] = useState("Curated starter set loaded");
+  const [status, setStatus] = useState(`Cached NASA snapshot loaded with ${archiveSnapshot.length} archive rows`);
   const [isLoading, setIsLoading] = useState(false);
+  const [activeGuide, setActiveGuide] = useState(fieldGuides[0].id);
+  const [educatorMode, setEducatorMode] = useState(true);
+  const nasaRequestRef = useRef<AbortController | null>(null);
+
+  useEffect(() => {
+    return () => {
+      nasaRequestRef.current?.abort();
+    };
+  }, []);
 
   useEffect(() => {
     if (!worlds.some((world) => world.id === selectedId)) {
@@ -129,25 +183,47 @@ function App() {
 
   const selected = worlds.find((world) => world.id === selectedId) ?? worlds[0];
   const evidence = buildEvidence(selected);
+  const evidenceCounts = evidence.reduce(
+    (counts, item) => ({ ...counts, [item.level]: counts[item.level] + 1 }),
+    { "Known from data": 0, Estimated: 0, Unknown: 0 } satisfies Record<EvidenceLevel, number>,
+  );
   const comparisonWorlds = comparisonIds.map((id) => worlds.find((world) => world.id === id)).filter(Boolean) as World[];
+  const activeGuideItem = fieldGuides.find((guide) => guide.id === activeGuide) ?? fieldGuides[0];
 
   async function loadNasaData() {
+    nasaRequestRef.current?.abort();
+    const controller = new AbortController();
+    nasaRequestRef.current = controller;
     setIsLoading(true);
     setStatus("Fetching NASA Exoplanet Archive composite parameters...");
 
     try {
-      const nasaWorlds = await fetchNasaWorlds();
-      const merged = [...curatedWorlds, ...nasaWorlds.filter((world) => !curatedWorlds.some((curated) => curated.name === world.name))];
+      const nasaWorlds = await fetchNasaWorlds(controller.signal);
+      if (nasaRequestRef.current !== controller) return;
+      const merged = mergeWorlds(curatedWorlds, nasaWorlds);
       setWorlds(merged);
       setSource("nasa");
       setStatus(`Loaded ${merged.length} worlds with NASA archive rows plus curated astrobiology references`);
     } catch (error) {
+      if (controller.signal.aborted) return;
       setSource("curated");
       setWorlds(curatedWorlds);
       setStatus(error instanceof Error ? `NASA fetch failed; using curated data. ${error.message}` : "NASA fetch failed; using curated data.");
     } finally {
-      setIsLoading(false);
+      if (nasaRequestRef.current === controller) {
+        nasaRequestRef.current = null;
+        setIsLoading(false);
+      }
     }
+  }
+
+  function loadSnapshot() {
+    const merged = mergeWorlds(curatedWorlds, archiveSnapshot);
+    setSource("snapshot");
+    setWorlds(merged);
+    setStatus(`Cached NASA snapshot loaded with ${archiveSnapshot.length} archive rows`);
+    setQuery("");
+    setMethod("All");
   }
 
   function resetCurated() {
@@ -185,6 +261,11 @@ function App() {
             <BookOpen size={18} /> Astrobiology <ExternalLink size={14} />
           </a>
         </div>
+        <div className="mission-strip" aria-label="Project safeguards">
+          <span><ShieldCheck size={17} /> Validated archive rows</span>
+          <span><Database size={17} /> Snapshot fallback</span>
+          <span><GraduationCap size={17} /> Educator mode</span>
+        </div>
       </section>
 
       <section className="workspace" aria-label="Exoplanet explorer">
@@ -194,7 +275,9 @@ function App() {
               <p className="eyebrow"><SlidersHorizontal size={15} /> Explorer</p>
               <h2>Worlds</h2>
             </div>
-            <span className={`source-pill ${source === "nasa" ? "is-live" : ""}`}>{source === "nasa" ? "NASA loaded" : "Curated"}</span>
+            <span className={`source-pill ${source === "nasa" ? "is-live" : ""}`}>
+              {source === "nasa" ? "NASA loaded" : source === "snapshot" ? "Snapshot" : "Curated"}
+            </span>
           </div>
 
           <label className="search-field">
@@ -218,7 +301,8 @@ function App() {
             <button className="primary-button" onClick={loadNasaData} disabled={isLoading}>
               <RefreshCw size={17} className={isLoading ? "spin" : ""} /> Load NASA data
             </button>
-            <button className="secondary-button" onClick={resetCurated}>Reset</button>
+            <button className="secondary-button" onClick={loadSnapshot}>Snapshot</button>
+            <button className="secondary-button" onClick={resetCurated}>Curated</button>
           </div>
 
           <p className="status-line">{status}</p>
@@ -265,6 +349,7 @@ function App() {
                 <span>{selected.discoveryYear ? selected.discoveryYear : "Reference"}</span>
                 <span>{selected.discoveryMethod}</span>
                 <span>{selected.distanceLy !== undefined ? `${formatNumber(selected.distanceLy, 1)} ly` : "Distance unknown"}</span>
+                <span>{selected.sourceLabel ?? "Curated source"}</span>
               </div>
             </div>
           </div>
@@ -280,6 +365,24 @@ function App() {
               <a href={selected.nasaUrl} target="_blank" rel="noreferrer">
                 Open source record <ExternalLink size={14} />
               </a>
+            </article>
+
+            <article className="science-card evidence-score-card">
+              <div className="card-heading">
+                <Layers3 size={18} />
+                <h3>Evidence balance</h3>
+              </div>
+              <div className="evidence-meter" aria-label="Evidence balance">
+                {evidenceOrder.map((level) => (
+                  <span
+                    key={level}
+                    className={`meter-segment ${level.toLowerCase().replace(/\s+/g, "-")}`}
+                    style={{ flexGrow: Math.max(evidenceCounts[level], 1) }}
+                    title={`${level}: ${evidenceCounts[level]}`}
+                  />
+                ))}
+              </div>
+              <p>{evidenceCounts.Unknown > 0 ? `${evidenceCounts.Unknown} open question${evidenceCounts.Unknown === 1 ? "" : "s"} remain visible.` : "This profile has no unknown fields in the current evidence board."}</p>
             </article>
 
             <article className="science-card temp-card">
@@ -311,10 +414,45 @@ function App() {
                       <strong>{item.label}</strong>
                       <span>{item.value}</span>
                       <p>{item.note}</p>
+                      <a href={item.sourceUrl} target="_blank" rel="noreferrer">
+                        Field source <ExternalLink size={13} />
+                      </a>
                     </article>
                   ))}
                 </div>
               ))}
+            </div>
+          </section>
+
+          <section className="field-guide" aria-label="Astrobiology field guide">
+            <div className="section-title">
+              <div>
+                <p className="eyebrow"><Telescope size={16} /> Field guide</p>
+                <h2>Turn the atlas into a research conversation</h2>
+              </div>
+              <button className="secondary-button" onClick={() => setEducatorMode((value) => !value)}>
+                {educatorMode ? "Hide prompts" : "Show prompts"}
+              </button>
+            </div>
+            <div className="guide-layout">
+              <div className="guide-tabs" role="tablist" aria-label="Astrobiology concepts">
+                {fieldGuides.map((guide) => (
+                  <button
+                    key={guide.id}
+                    className={`guide-tab ${activeGuide === guide.id ? "is-selected" : ""}`}
+                    onClick={() => setActiveGuide(guide.id)}
+                    role="tab"
+                    aria-selected={activeGuide === guide.id}
+                  >
+                    {guide.title}
+                  </button>
+                ))}
+              </div>
+              <article className="guide-card">
+                <h3>{activeGuideItem.title}</h3>
+                <p>{activeGuideItem.body}</p>
+                {educatorMode ? <strong>{activeGuideItem.prompt}</strong> : null}
+              </article>
             </div>
           </section>
         </section>

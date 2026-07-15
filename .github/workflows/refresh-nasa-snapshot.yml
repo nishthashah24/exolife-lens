@@ -1,0 +1,33 @@
+name: Refresh NASA snapshot
+
+on:
+  schedule:
+    - cron: "21 8 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm ci
+      - run: npm run data:refresh
+      - run: npm run build
+      - name: Commit updated snapshot
+        run: |
+          if git diff --quiet -- src/data/nasa-snapshot.json; then
+            echo "No NASA snapshot changes"
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src/data/nasa-snapshot.json
+          git commit -m "Refresh NASA exoplanet snapshot" -m "Update the cached archive data used when live requests are unavailable."
+          git push

@@ -16,6 +16,7 @@ export type World = {
   nasaUrl: string;
   summary: string;
   whyItMatters: string;
+  sourceLabel?: string;
 };
 
 export type EvidenceItem = {
@@ -23,4 +24,5 @@ export type EvidenceItem = {
   value: string;
   level: EvidenceLevel;
   note: string;
+  sourceUrl: string;
 };

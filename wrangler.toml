@@ -1,0 +1,8 @@
+name = "exolife-lens"
+compatibility_date = "2026-08-21"
+pages_build_output_dir = "dist"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "exolife-lens"
+database_id = "replace-after-cloudflare-d1-create"

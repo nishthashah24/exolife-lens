@@ -10,6 +10,7 @@ This is a static education app, so the main risks are data integrity, stale remo
 - Stale async updates: live fetches use `AbortController` and ignore replaced requests.
 - Missing security headers: `public/_headers` adds CSP, frame protection, content sniffing protection, referrer policy, and a restrictive permissions policy.
 - Weak citation granularity: evidence items now link directly to the source record instead of only the selected world page.
+- Public/private blog split: public post APIs omit private view counts, while admin APIs require Cloudflare Access identity headers and `ADMIN_EMAIL`.
 
 ## Remaining Watch Items
 
@@ -17,3 +18,4 @@ This is a static education app, so the main risks are data integrity, stale remo
 - The NASA Exoplanet Archive schema can change, so the weekly snapshot workflow should be monitored.
 - External source pages are trusted by link only; the app does not embed third-party scripts or images.
 - Accessibility should be tested with keyboard-only navigation and a screen reader before broad release.
+- The admin page must be protected by Cloudflare Access in production; a front-end route alone is not authentication.

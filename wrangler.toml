@@ -4,5 +4,5 @@ pages_build_output_dir = "dist"
 
 [[d1_databases]]
 binding = "DB"
-database_name = "exolife-lens"
-database_id = "replace-after-cloudflare-d1-create"
+database_name = "my-blog-db"
+database_id = "7f794f84-62d5-4d28-8664-4d5d13c0d7d3"

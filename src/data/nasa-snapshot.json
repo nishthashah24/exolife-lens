@@ -1,5 +1,18 @@
 [
   {
+    "pl_name": "LHS 1903 b",
+    "hostname": "LHS 1903",
+    "sy_dist": 35.6917,
+    "pl_rade": 1.382,
+    "pl_bmasse": 3.28,
+    "pl_orbper": 2.1555098,
+    "pl_eqt": 796,
+    "st_teff": 3664,
+    "st_rad": 0.539,
+    "discoverymethod": "Transit",
+    "disc_year": 2026
+  },
+  {
     "pl_name": "Gliese 12 b",
     "hostname": "Gliese 12",
     "sy_dist": 12.21,
@@ -26,32 +39,6 @@
     "disc_year": 2021
   },
   {
-    "pl_name": "Kepler-1349 b",
-    "hostname": "Kepler-1349",
-    "sy_dist": 276.323,
-    "pl_rade": 0.7,
-    "pl_bmasse": 0.271,
-    "pl_orbper": 2.12823928,
-    "pl_eqt": 1668,
-    "st_teff": 6086,
-    "st_rad": 1.28,
-    "discoverymethod": "Transit",
-    "disc_year": 2016
-  },
-  {
-    "pl_name": "Kepler-1406 b",
-    "hostname": "Kepler-1406",
-    "sy_dist": 572.403,
-    "pl_rade": 1.1,
-    "pl_bmasse": 1.37,
-    "pl_orbper": 11.62905828,
-    "pl_eqt": 854,
-    "st_teff": 5892,
-    "st_rad": 1.12,
-    "discoverymethod": "Transit",
-    "disc_year": 2016
-  },
-  {
     "pl_name": "Kepler-948 b",
     "hostname": "Kepler-948",
     "sy_dist": 868.017,
@@ -74,6 +61,32 @@
     "pl_eqt": 1270,
     "st_teff": 5214,
     "st_rad": 0.82,
+    "discoverymethod": "Transit",
+    "disc_year": 2016
+  },
+  {
+    "pl_name": "Kepler-1406 b",
+    "hostname": "Kepler-1406",
+    "sy_dist": 572.403,
+    "pl_rade": 1.1,
+    "pl_bmasse": 1.37,
+    "pl_orbper": 11.62905828,
+    "pl_eqt": 854,
+    "st_teff": 5892,
+    "st_rad": 1.12,
+    "discoverymethod": "Transit",
+    "disc_year": 2016
+  },
+  {
+    "pl_name": "Kepler-1349 b",
+    "hostname": "Kepler-1349",
+    "sy_dist": 276.323,
+    "pl_rade": 0.7,
+    "pl_bmasse": 0.271,
+    "pl_orbper": 2.12823928,
+    "pl_eqt": 1668,
+    "st_teff": 6086,
+    "st_rad": 1.28,
     "discoverymethod": "Transit",
     "disc_year": 2016
   },
@@ -724,19 +737,6 @@
     "pl_eqt": 949,
     "st_teff": 5208,
     "st_rad": 0.786,
-    "discoverymethod": "Transit",
-    "disc_year": 2014
-  },
-  {
-    "pl_name": "Kepler-347 b",
-    "hostname": "Kepler-347",
-    "sy_dist": 1298.88,
-    "pl_rade": 1.97,
-    "pl_bmasse": 4.54,
-    "pl_orbper": 12.79836,
-    "pl_eqt": 908,
-    "st_teff": 6088,
-    "st_rad": 1.005,
     "discoverymethod": "Transit",
     "disc_year": 2014
   },

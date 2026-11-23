@@ -26,6 +26,19 @@
     "disc_year": 2024
   },
   {
+    "pl_name": "TOI-1749 b",
+    "hostname": "TOI-1749",
+    "sy_dist": 99.5561,
+    "pl_rade": 1.39,
+    "pl_bmasse": 57,
+    "pl_orbper": 2.38839,
+    "pl_eqt": 831,
+    "st_teff": 3985,
+    "st_rad": 0.55,
+    "discoverymethod": "Transit",
+    "disc_year": 2021
+  },
+  {
     "pl_name": "TOI-2285 b",
     "hostname": "TOI-2285",
     "sy_dist": 42.409,
@@ -37,19 +50,6 @@
     "st_rad": 0.464,
     "discoverymethod": "Transit",
     "disc_year": 2021
-  },
-  {
-    "pl_name": "Kepler-948 b",
-    "hostname": "Kepler-948",
-    "sy_dist": 868.017,
-    "pl_rade": 1.85,
-    "pl_bmasse": 4.08,
-    "pl_orbper": 7.76846622,
-    "pl_eqt": 841,
-    "st_teff": 5679,
-    "st_rad": 0.94,
-    "discoverymethod": "Transit",
-    "disc_year": 2016
   },
   {
     "pl_name": "Kepler-969 c",
@@ -74,6 +74,19 @@
     "pl_eqt": 854,
     "st_teff": 5892,
     "st_rad": 1.12,
+    "discoverymethod": "Transit",
+    "disc_year": 2016
+  },
+  {
+    "pl_name": "Kepler-1222 b",
+    "hostname": "Kepler-1222",
+    "sy_dist": 415.218,
+    "pl_rade": 0.79,
+    "pl_bmasse": 0.418,
+    "pl_orbper": 1.916944254,
+    "pl_eqt": 1246,
+    "st_teff": 5239,
+    "st_rad": 0.8,
     "discoverymethod": "Transit",
     "disc_year": 2016
   },
@@ -117,15 +130,15 @@
     "disc_year": 2016
   },
   {
-    "pl_name": "Kepler-1222 b",
-    "hostname": "Kepler-1222",
-    "sy_dist": 415.218,
-    "pl_rade": 0.79,
-    "pl_bmasse": 0.418,
-    "pl_orbper": 1.916944254,
-    "pl_eqt": 1246,
-    "st_teff": 5239,
-    "st_rad": 0.8,
+    "pl_name": "Kepler-948 b",
+    "hostname": "Kepler-948",
+    "sy_dist": 868.017,
+    "pl_rade": 1.85,
+    "pl_bmasse": 4.08,
+    "pl_orbper": 7.76846622,
+    "pl_eqt": 841,
+    "st_teff": 5679,
+    "st_rad": 0.94,
     "discoverymethod": "Transit",
     "disc_year": 2016
   },
@@ -741,6 +754,19 @@
     "disc_year": 2014
   },
   {
+    "pl_name": "Kepler-347 b",
+    "hostname": "Kepler-347",
+    "sy_dist": 1298.88,
+    "pl_rade": 1.97,
+    "pl_bmasse": 4.54,
+    "pl_orbper": 12.79836,
+    "pl_eqt": 908,
+    "st_teff": 6088,
+    "st_rad": 1.005,
+    "discoverymethod": "Transit",
+    "disc_year": 2014
+  },
+  {
     "pl_name": "KOI-351 c",
     "hostname": "KOI-351",
     "sy_dist": 848.254,
@@ -764,32 +790,6 @@
     "st_teff": 6080,
     "st_rad": 1.2,
     "discoverymethod": "Transit",
-    "disc_year": 2013
-  },
-  {
-    "pl_name": "GJ 667 C c",
-    "hostname": "GJ 667 C",
-    "sy_dist": 7.24396,
-    "pl_rade": 1.77,
-    "pl_bmasse": 3.8,
-    "pl_orbper": 28.14,
-    "pl_eqt": null,
-    "st_teff": 3350,
-    "st_rad": null,
-    "discoverymethod": "Radial Velocity",
-    "disc_year": 2013
-  },
-  {
-    "pl_name": "GJ 667 C f",
-    "hostname": "GJ 667 C",
-    "sy_dist": 7.24396,
-    "pl_rade": 1.45,
-    "pl_bmasse": 2.7,
-    "pl_orbper": 39.026,
-    "pl_eqt": null,
-    "st_teff": 3350,
-    "st_rad": null,
-    "discoverymethod": "Radial Velocity",
     "disc_year": 2013
   },
   {
@@ -819,19 +819,6 @@
     "disc_year": 2013
   },
   {
-    "pl_name": "Kepler-62 e",
-    "hostname": "Kepler-62",
-    "sy_dist": 300.874,
-    "pl_rade": 1.61,
-    "pl_bmasse": 36,
-    "pl_orbper": 122.3874,
-    "pl_eqt": 270,
-    "st_teff": 4925,
-    "st_rad": 0.64,
-    "discoverymethod": "Transit",
-    "disc_year": 2013
-  },
-  {
     "pl_name": "Kepler-69 c",
     "hostname": "Kepler-69",
     "sy_dist": 730.625,
@@ -841,6 +828,19 @@
     "pl_eqt": 299,
     "st_teff": 5638,
     "st_rad": 0.93,
+    "discoverymethod": "Transit",
+    "disc_year": 2013
+  },
+  {
+    "pl_name": "Kepler-62 e",
+    "hostname": "Kepler-62",
+    "sy_dist": 300.874,
+    "pl_rade": 1.61,
+    "pl_bmasse": 36,
+    "pl_orbper": 122.3874,
+    "pl_eqt": 270,
+    "st_teff": 4925,
+    "st_rad": 0.64,
     "discoverymethod": "Transit",
     "disc_year": 2013
   },
